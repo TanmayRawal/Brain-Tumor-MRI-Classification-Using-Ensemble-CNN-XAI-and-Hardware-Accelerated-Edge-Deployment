@@ -91,7 +91,20 @@ MRI Input
 ## 📊 Dataset
 
 **Source:** [Kaggle — Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
+---
 
+## 🧾 Dataset Overview
+
+Below is a visual overview of the four MRI categories used in this project:
+
+- **No Tumor**
+- **Glioma**
+- **Meningioma**
+- **Pituitary Tumor**
+
+![Dataset Class Overview](results/dataset_overview.png)
+
+> The dataset contains diverse MRI orientations and tumor shapes, making it suitable for evaluating generalization capability of deep CNN models.
 The dataset contains **7,023 MRI scans** drawn from Figshare, SARTAJ, and Br35H datasets, classified into four categories:
 
 | Class | Training Images | Testing Images |
@@ -108,6 +121,13 @@ The dataset contains **7,023 MRI scans** drawn from Figshare, SARTAJ, and Br35H 
 
 ## 🔧 Preprocessing Pipeline
 
+### ✂️ Illustration of Cropping Process
+
+The cropping stage isolates the brain region using contour detection and removes irrelevant background structures.
+
+![Cropping Process Illustration](results/cropping_process.png)
+
+> The cropping mechanism ensures that the model focuses only on relevant anatomical regions, improving both training stability and interpretability.
 Each raw MRI scan passes through four sequential stages before being fed into any model:
 
 **1. Cropping (ROI Extraction)** — OpenCV contour detection isolates the brain region. Gaussian blur + Otsu thresholding creates a binary mask, the largest contour defines the brain boundary, and extreme points mark crop edges. Background (hair, skin) is removed.
@@ -118,6 +138,14 @@ Each raw MRI scan passes through four sequential stages before being fed into an
 
 **4. Resize** — All images are standardized to **224 × 224 pixels**.
 
+
+### 🧠 Preprocessed Image Grid
+
+Below is a sample grid of preprocessed MRI images after cropping, denoising, colormap application, and resizing:
+
+![Preprocessed Image Grid](results/preprocessed_grid.png)
+
+> The preprocessing pipeline standardizes contrast and spatial resolution across all samples before feeding them into the CNN models.
 ### Data Split (80–10–10)
 - **Training:** 5,712 images (full original training set)
 - **Validation:** 656 images (50% of original testing folder)
@@ -209,7 +237,29 @@ Three complementary explainability techniques are applied, along with quantitati
 | **Consistency** | Reproducibility of explanations across similar inputs |
 | **Stability** | Robustness of explanations to small input perturbations |
 
----
+
+
+## 📊 Quantitative XAI Evaluation Results
+
+To objectively compare explanation methods, we computed three evaluation metrics:
+
+- **Fidelity**
+- **Consistency**
+- **Stability**
+
+| Method   | Consistency | Fidelity  | Stability |
+|----------|------------|-----------|-----------|
+| Grad-CAM | 0.238718   | 0.466436  | 0.727833  |
+| LIME     | 0.312174   | 0.655439  | 0.428957  |
+| SHAP     | 0.342654   | 0.543291  | 0.624260  |
+
+### Interpretation
+
+- **LIME** achieves the highest fidelity.
+- **SHAP** demonstrates the best consistency.
+- **Grad-CAM** shows strongest stability.
+
+This quantitative evaluation provides a scientific comparison of explanation reliability rather than relying only on visual interpretation.
 
 ## 📈 Results
 
@@ -238,7 +288,7 @@ Three complementary explainability techniques are applied, along with quantitati
 
 **Confusion Matrix:**
 
-![EfficientNetB0 Confusion Matrix](results/confusion_matrices/efficientnetb0.png)
+![EfficientNetB0 Confusion Matrix](results/confusion_matrix/efficientnetb0.png)
 
 **Training vs Validation Accuracy:**
 
@@ -266,7 +316,7 @@ Three complementary explainability techniques are applied, along with quantitati
 
 **Confusion Matrix:**
 
-![InceptionV3 Confusion Matrix](results/confusion_matrices/inceptionv3.png)
+![InceptionV3 Confusion Matrix](results/confusion_matrix/inceptionv3.png)
 
 **Training vs Validation Accuracy:**
 
@@ -294,7 +344,7 @@ Three complementary explainability techniques are applied, along with quantitati
 
 **Confusion Matrix:**
 
-![Xception Confusion Matrix](results/confusion_matrices/xception.png)
+![Xception Confusion Matrix](results/confusion_matrix/xception.png)
 
 **Training vs Validation Accuracy:**
 
@@ -322,7 +372,7 @@ Three complementary explainability techniques are applied, along with quantitati
 
 **Confusion Matrix:**
 
-![Weighted Ensemble Confusion Matrix](results/confusion_matrices/ensemble.png)
+![Weighted Ensemble Confusion Matrix](results/confusion_matrix/ensemble.png)
 
 > The Weighted Ensemble achieves the highest overall accuracy (99.39%) by combining all three models using validation-accuracy-proportional weights. The ensemble is ideal for offline or diagnostic-priority settings where maximum precision matters more than inference speed.
 
@@ -403,44 +453,47 @@ Trained Keras Model (FP32)
 ## 📁 Repository Structure
 
 ```
-Brain-Tumor-MRI-Classification/
+Brain-Tumor-MRI-Classification-Using-Ensemble-CNN-XAI-and-Hardware-Accelerated-Edge-Deployment/
 │
-├── README.md
-├── requirements.txt
-├── .gitignore
+├── Readme.md
 │
 ├── notebooks/
 │   ├── 01_EfficientNetB0.ipynb
 │   ├── 02_InceptionV3.ipynb
 │   ├── 03_Xception.ipynb
-│   ├── 04_Ensemble.ipynb
-│   └── 05_XAI_GradCAM_LIME_SHAP.ipynb
+│   └── 04_Ensemble.ipynb
 │
 ├── hardware/
-│   ├── quantize_tf2.py
-│   ├── dpu_inference.py
-│   └── README_hardware.md
+│   ├── Dpu_inference.ipynb
+│   ├── wifi_connectivity.ipynb
+│   ├── tumor_net_tf2.xmodel
+│   └── HARDWARE_README.md
 │
 ├── results/
-│   ├── confusion_matrices/
-│   │   ├── CONFUSION_MATRIX_EFFICIENTNETB0.png
-│   │   ├── CONFUSION_MATRIX_INCEPTION.png
-│   │   └── CONFUSION_MATRIX_XCEPTION.png
+│   ├── confusion_matrix/
+│   │   ├── efficientnetb0.png
+│   │   ├── inceptionv3.png
+│   │   ├── xception.png
+│   │   └── ensemble.png
+│   │
 │   ├── training_curves/
-│   │   ├── accuracy_vs_validation-EFFICIENTNETB0.png
-│   │   ├── loss_vs_validation-EFFICIENTNETB0.png
-│   │   ├── accuracy_vs_validation_INCEPTION.png
-│   │   ├── loss_vs_validation_INCEPTION.png
-│   │   ├── accuracy_vs_validation_XCEPTION.png
-│   │   └── loss_vs_validation_XCEPTION.png
-│   └── xai/
+│   │   ├── efficientnetb0_accuracy.png
+│   │   ├── efficientnetb0_loss.png
+│   │   ├── inceptionv3_accuracy.png
+│   │   ├── inceptionv3_loss.png
+│   │   ├── xception_accuracy.png
+│   │   └── xception_loss.png
+│   │
+│   └── XAI/
 │       ├── gradcam.png
 │       ├── lime.png
-│       └── shap.png
+│       ├── shap.png
+│       ├── cropping_process.png
+│       ├── dataset_overview.png
+│       └── preprocessed_grid.png
 │
 └── dataset/
-    └── README.md
-```
+    
 
 ---
 
@@ -479,12 +532,9 @@ jupyter notebook notebooks/03_Xception.ipynb
 # Step 4: Weighted Ensemble (loads all 3 saved weights)
 jupyter notebook notebooks/04_Ensemble.ipynb
 
-# Step 5: XAI — Grad-CAM, LIME, SHAP + Fidelity/Consistency/Stability
-jupyter notebook notebooks/05_XAI_GradCAM_LIME_SHAP.ipynb
 ```
 
-For PYNQ-ZU hardware deployment, see [`hardware/README_hardware.md`](hardware/README_hardware.md).
-
+For PYNQ-ZU hardware deployment, see [`hardware/HARDWARE_README.md`](hardware/HARDWARE_README.md).
 ---
 
 ## 📦 Requirements
