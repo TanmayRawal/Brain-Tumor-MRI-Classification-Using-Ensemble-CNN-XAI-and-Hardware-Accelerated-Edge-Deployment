@@ -383,17 +383,17 @@ This quantitative evaluation provides a scientific comparison of explanation rel
 #### Grad-CAM — Class Activation Heatmaps
 Grad-CAM highlights the regions that most strongly influence the model's prediction by backpropagating gradients to the final convolutional layer. Red/yellow areas indicate high activation. The activated regions correspond closely to the actual tumor locations, confirming the model relies on clinically relevant anatomy.
 
-![Grad-CAM Heatmaps](results/xai/gradcam.png)
+![Grad-CAM Heatmaps](results/XAI/gradcam.png)
 
 #### LIME — Local Super-pixel Explanations
 LIME segments the MRI into super-pixels and identifies which regions most strongly affect the predicted probability when perturbed. Green highlighted regions are the most influential super-pixels — Glioma (left pair) and Meningioma (right pair).
 
-![LIME Visualizations](results/xai/lime.png)
+![LIME Visualizations](results/XAI/lime.png)
 
 #### SHAP — Shapley Value Attribution Maps
 SHAP assigns a contribution value to every pixel using game-theoretic Shapley values. Red pixels push the prediction toward the predicted class; blue pixels push against it. The maps provide fine-grained pixel-level insight into how different MRI regions jointly drive the model's decision.
 
-![SHAP Visualizations](results/xai/shap.png)
+![SHAP Visualizations](results/XAI/shap.png)
 
 ---
 
